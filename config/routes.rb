@@ -28,6 +28,7 @@ Rails.application.routes.draw do
           delete "/remove_coupon", to: "invoices#remove_coupon"
         end
       end
+      resources :coupons, only: [:create, :show, :index]  
     end
   end
 end
