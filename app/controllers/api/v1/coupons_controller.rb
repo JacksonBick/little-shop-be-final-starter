@@ -14,6 +14,8 @@ module Api
 
       def create
         @coupon = Coupon.new(coupon_params)
+        @coupon.activated = false 
+    
         if @coupon.save
           render json: @coupon, status: :created
         else
@@ -41,7 +43,8 @@ module Api
       private
 
       def set_coupon
-        @coupon = Coupon.find(params[:id])
+        @coupon = Coupon.find_by(id: params[:id])
+        render json: { error: "Coupon not found" }, status: :not_found unless @coupon
       end
 
       def coupon_params
