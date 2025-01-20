@@ -9,7 +9,21 @@ module Api
       end
 
       def show
-        render json: @coupon
+        render json: {
+      data: {
+        id: @coupon.id,
+        type: 'coupon',
+        attributes: {
+          name: @coupon.name,
+          code: @coupon.code,
+          value_type: @coupon.value_type,
+          value: @coupon.value,
+          activated: @coupon.activated,
+          merchant_id: @coupon.merchant_id,
+          usage_count: @coupon.usage_count # Shows how many invoices are using this coupon
+        }
+      }
+    }
       end
 
       def create
@@ -49,6 +63,18 @@ module Api
 
       def coupon_params
         params.require(:coupon).permit(:name, :code, :value_type, :value, :merchant_id)
+      end
+
+      def coupon_attributes(coupon)
+        {
+          name: coupon.name,
+          code: coupon.code,
+          value_type: coupon.value_type,
+          value: coupon.value,
+          activated: coupon.activated,
+          merchant_id: coupon.merchant_id,
+          usage_count: coupon.usage_count 
+        }
       end
     end
   end
