@@ -1,4 +1,5 @@
 class Api::V1::Merchants::InvoicesController < ApplicationController
+  before_action :set_merchant
   def index
     merchant = Merchant.find(params[:merchant_id])
     if params[:status].present?

@@ -24,6 +24,9 @@ Rails.application.routes.draw do
         resources :items, only: :index, controller: "merchants/items"
         resources :customers, only: :index, controller: "merchants/customers"
         resources :invoices, only: :index, controller: "merchants/invoices" do
+          post "/add_coupon", to: "invoices#add_coupon"
+          delete "/remove_coupon", to: "invoices#remove_coupon"
+        end
       end
     end
   end
