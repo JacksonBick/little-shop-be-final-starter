@@ -4,7 +4,7 @@ class Item < ApplicationRecord
   validates :unit_price, presence: true, numericality: true
   belongs_to :merchant
   has_many :invoice_items, dependent: :destroy
-  # has_many :invoices, through: :invoice_items
+
 
   def self.sort_by_price
     self.order(unit_price: :asc)
