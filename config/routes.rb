@@ -21,7 +21,7 @@ Rails.application.routes.draw do
         resources :find_all, only: :index, controller: :search
       end
       resources :merchants, except: [:new, :edit] do
-        resources :coupons, only: [:index]
+        resources :coupons, only: [:index, :create]
         resources :items, only: :index, controller: "merchants/items"
         resources :customers, only: :index, controller: "merchants/customers"
         resources :invoices, only: :index, controller: "merchants/invoices" do

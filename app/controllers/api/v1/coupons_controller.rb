@@ -2,7 +2,7 @@ module Api
   module V1
     class CouponsController < ApplicationController
       before_action :set_coupon, only: [:show, :update, :destroy, :toggle_activation]
-      before_action :set_merchant, only: [:index]  # Add this line to set the merchant
+      before_action :set_merchant, only: [:index, :create]  # Add this line to set the merchant
 
       # GET /api/v1/merchants/:merchant_id/coupons
       def index
@@ -23,10 +23,16 @@ module Api
 
       def create
         @coupon = Coupon.new(coupon_params)
-        @coupon.activated = false 
-
+        @coupon.activated = false  # Ensure this is set correctly
+        
         if @coupon.save
-          render json: @coupon, status: :created
+          render json: {
+            data: {
+              id: @coupon.id,
+              type: 'coupon',
+              attributes: coupon_attributes(@coupon)
+            }
+          }, status: :created
         else
           render json: @coupon.errors, status: :unprocessable_entity
         end

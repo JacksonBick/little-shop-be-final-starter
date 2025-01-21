@@ -4,7 +4,7 @@ class Coupon < ApplicationRecord
   
 
   validates :name, presence: true
-  validates :code, presence: true, uniqueness: true
+  validates :code, presence: true, uniqueness: { scope: :merchant_id, message: "Coupon code must be unique per merchant." }
   validates :value_type, inclusion: { in: ['percent-off', 'dollar-off'] }
   validates :value, presence: true
   validate :merchant_can_have_max_5_active_coupons, on: :create
