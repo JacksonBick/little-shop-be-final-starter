@@ -21,17 +21,19 @@ Rails.application.routes.draw do
         resources :find_all, only: :index, controller: :search
       end
       resources :merchants, except: [:new, :edit] do
+        resources :coupons, only: [:index, :show, :create, :update, :destroy] do
+          post '/toggle_activation', to: 'coupons#toggle_activation'
+          post '/deactivate', to: 'coupons#deactivate'
         resources :items, only: :index, controller: "merchants/items"
         resources :customers, only: :index, controller: "merchants/customers"
         resources :invoices, only: :index, controller: "merchants/invoices" do
           post "/add_coupon", to: "invoices#add_coupon"
           delete "/remove_coupon", to: "invoices#remove_coupon"
         
+          
         end
       end
-      resources :coupons, only: [:index, :show, :create, :update, :destroy] do
-        post '/toggle_activation', to: 'coupons#toggle_activation'
-        post '/deactivate', to: 'coupons#deactivate'
+      
       end
     end
   end
