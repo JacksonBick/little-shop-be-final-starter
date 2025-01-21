@@ -13,6 +13,7 @@ class Coupon < ApplicationRecord
   scope :active, -> { where(activated: true) }
   scope :inactive, -> { where(activated: false) }
 
+  after_initialize :set_default_activated, if: :new_record?
   # Methods
   def toggle_activation
     update(activated: !activated)
@@ -25,7 +26,21 @@ class Coupon < ApplicationRecord
     end
   end
 
+  def deactivate
+    return false if usage_count > 0
+    update(activated: false)
+  end
+
+  def activate
+    return false if activated?
+    update(activated: true)
+  end
+
+  def set_default_activated
+    self.activated ||= false
+  end
+
   def usage_count
-    invoices.count
+    invoices.count || 0
   end
 end

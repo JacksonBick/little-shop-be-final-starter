@@ -24,6 +24,7 @@ Rails.application.routes.draw do
         resources :coupons, only: [:index, :show, :create, :update, :destroy] do
           post '/toggle_activation', to: 'coupons#toggle_activation'
           post '/deactivate', to: 'coupons#deactivate'
+          post '/activate', to: 'coupons#activate'
         resources :items, only: :index, controller: "merchants/items"
         resources :customers, only: :index, controller: "merchants/customers"
         resources :invoices, only: :index, controller: "merchants/invoices" do

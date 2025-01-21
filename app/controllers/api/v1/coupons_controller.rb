@@ -6,8 +6,21 @@ module Api
 
       # GET /api/v1/merchants/:merchant_id/coupons
       def index
-        # Fetch all coupons belonging to the specific merchant
-        @coupons = @merchant.coupons
+        if params[:status].present?
+          if params[:status] == 'active'
+            @coupons = @merchant.coupons.active
+          elsif params[:status] == 'inactive'
+            @coupons = @merchant.coupons.inactive
+          else
+            render json: { error: "Invalid status parameter. Use 'active' or 'inactive'." }, status: :unprocessable_entity
+            return
+          end
+        else
+          # If no 'status' param is passed, show all coupons
+          @coupons = @merchant.coupons
+        end
+      
+        # Return the filtered list of coupons
         render json: { data: @coupons.map { |coupon| coupon_json(coupon) } }
       end
 
@@ -46,6 +59,7 @@ module Api
         end
       end
 
+      
       def destroy
         render json: { message: 'Cannot delete a coupon. Only deactivate it.' }, status: :forbidden
       end
@@ -55,21 +69,7 @@ module Api
         render json: @coupon
       end
 
-      def deactivate
-        if @coupon.usage_count > 0 # Assuming usage_count is tied to how many invoices use the coupon
-          render json: { error: "Coupon cannot be deactivated because there are pending invoices." }, status: :unprocessable_entity
-        else
-          @coupon.update(activated: false)
-          render json: {
-            data: {
-              id: @coupon.id,
-              type: 'coupon',
-              attributes: coupon_attributes(@coupon)
-            }
-          }, status: :ok
-        end
-      end
-
+      
       private
 
       def set_coupon
@@ -107,6 +107,8 @@ module Api
           attributes: coupon_attributes(coupon)
         }
       end
+
+      
     end
   end
 end
