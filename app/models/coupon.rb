@@ -14,12 +14,11 @@ class Coupon < ApplicationRecord
   scope :inactive, -> { where(activated: false) }
 
   after_initialize :set_default_activated, if: :new_record?
-  # Methods
+
   def toggle_activation
     update(activated: !activated)
   end
 
-  # Custom validation to ensure a merchant has a max of 5 active coupons
   def merchant_can_have_max_5_active_coupons
     if merchant.coupons.active.count >= 5
       errors.add(:base, "A merchant can only have 5 active coupons at a time.")

@@ -2,8 +2,7 @@ module Api
   module V1
     class CouponsController < ApplicationController
       before_action :set_coupon, only: [:show, :update, :destroy, :toggle_activation, :activate, :deactivate]
-      before_action :set_merchant, only: [:index, :create]  # Add this line to set the merchant
-
+      before_action :set_merchant, only: [:index, :create]  
       # GET /api/v1/merchants/:merchant_id/coupons
       def index
         if params[:status].present?
@@ -19,7 +18,6 @@ module Api
           @coupons = @merchant.coupons
         end
       
-        # Return the filtered list of coupons
         render json: { data: @coupons.map { |coupon| coupon_json(coupon) } }
       end
     
