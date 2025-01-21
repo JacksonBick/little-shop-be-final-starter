@@ -21,6 +21,7 @@ Rails.application.routes.draw do
         resources :find_all, only: :index, controller: :search
       end
       resources :merchants, except: [:new, :edit] do
+        resources :coupons, only: [:index]
         resources :items, only: :index, controller: "merchants/items"
         resources :customers, only: :index, controller: "merchants/customers"
         resources :invoices, only: :index, controller: "merchants/invoices" do
@@ -28,7 +29,9 @@ Rails.application.routes.draw do
           delete "/remove_coupon", to: "invoices#remove_coupon"
         end
       end
-      resources :coupons, only: [:create, :show, :index]  
+      resources :coupons, only: [:index, :show, :create, :update, :destroy] do
+        post '/toggle_activation', to: 'coupons#toggle_activation'
+      end
     end
   end
 end

@@ -6,6 +6,7 @@ class Invoice < ApplicationRecord
   has_many :transactions, dependent: :destroy
 
   validates :status, inclusion: { in: ["shipped", "packaged", "returned"] }
+  validates :customer_id, presence: true
 
   def apply_coupon(coupon)
     if coupon.activated? && !self.coupon

@@ -1,5 +1,6 @@
 class Coupon < ApplicationRecord
   belongs_to :merchant
+  has_many :invoices
   
 
   validates :name, presence: true
@@ -25,6 +26,6 @@ class Coupon < ApplicationRecord
   end
 
   def usage_count
-    Invoice.where(coupon_id: self.id).count
+    invoices.count
   end
 end
