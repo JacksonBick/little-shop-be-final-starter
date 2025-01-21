@@ -55,6 +55,21 @@ module Api
         render json: @coupon
       end
 
+      def deactivate
+        if @coupon.usage_count > 0 # Assuming usage_count is tied to how many invoices use the coupon
+          render json: { error: "Coupon cannot be deactivated because there are pending invoices." }, status: :unprocessable_entity
+        else
+          @coupon.update(activated: false)
+          render json: {
+            data: {
+              id: @coupon.id,
+              type: 'coupon',
+              attributes: coupon_attributes(@coupon)
+            }
+          }, status: :ok
+        end
+      end
+
       private
 
       def set_coupon

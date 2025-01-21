@@ -16,21 +16,20 @@ Rails.application.routes.draw do
       resources :items, except: [:new, :edit] do
         get "/merchant", to: "items/merchants#show"
       end
-      namespace :merchants do
-        resources :find, only: :index, controller: :search, action: :show
-        resources :find_all, only: :index, controller: :search
-      end
+
       resources :merchants, except: [:new, :edit] do
-        resources :coupons, only: [:index, :create]
-        resources :items, only: :index, controller: "merchants/items"
-        resources :customers, only: :index, controller: "merchants/customers"
-        resources :invoices, only: :index, controller: "merchants/invoices" do
-          post "/add_coupon", to: "invoices#add_coupon"
-          delete "/remove_coupon", to: "invoices#remove_coupon"
+        resources :invoices, only: :index, controller: "merchants/invoices"
+        
+       
+        resources :coupons, only: [:index, :show, :create, :update, :destroy], controller: "merchants/coupons" do
+          post '/toggle_activation', to: 'coupons#toggle_activation'
+          post '/deactivate', to: 'coupons#deactivate'
         end
       end
+
       resources :coupons, only: [:index, :show, :create, :update, :destroy] do
         post '/toggle_activation', to: 'coupons#toggle_activation'
+        post '/deactivate', to: 'coupons#deactivate'
       end
     end
   end
