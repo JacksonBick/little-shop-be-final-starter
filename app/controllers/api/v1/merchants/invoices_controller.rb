@@ -7,9 +7,9 @@ class Api::V1::Merchants::InvoicesController < ApplicationController
     else
       invoices = merchant.invoices
     end
-    render json: InvoiceSerializer.new(invoices)
+    render json: invoices, status: :ok  # Adjust based on your needs
   end
-
+  
   def add_coupon
     invoice = @merchant.invoices.find(params[:invoice_id])
 
@@ -43,6 +43,20 @@ class Api::V1::Merchants::InvoicesController < ApplicationController
   private
 
   def set_merchant
-    @merchant = Merchant.find(params[:merchant_id])
+    @merchant = Merchant.find_by(id: params[:merchant_id])
+        render json: { error: "Merchant not found" }, status: :not_found unless @merchant
+  end
+
+  def invoice_json(invoice)
+    {
+      id: invoice.id,
+      type: 'invoice',
+      attributes: {
+        customer_id: invoice.customer_id,
+        merchant_id: invoice.merchant_id,
+        coupon_id: invoice.coupon_id,  # Include the coupon_id if used
+        status: invoice.status
+      }
+    }
   end
 end

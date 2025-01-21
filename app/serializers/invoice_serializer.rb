@@ -1,6 +1,6 @@
 class InvoiceSerializer
   include JSONAPI::Serializer
-  attributes :merchant_id, :customer_id, :status
+  attributes :id, :merchant_id, :customer_id, :status, :coupon_id
 
   attribute :coupon do |invoice|
     if invoice.coupon.present?
@@ -15,4 +15,5 @@ class InvoiceSerializer
       nil
     end
   end
+  belongs_to :coupon, optional: true
 end

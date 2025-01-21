@@ -8,6 +8,8 @@ class Invoice < ApplicationRecord
   validates :status, inclusion: { in: ["shipped", "packaged", "returned"] }
   validates :customer_id, presence: true
 
+  scope :filtered_by_status, ->(status) { where(status: status) }
+
   def apply_coupon(coupon)
     if coupon.activated? && !self.coupon
       update(coupon: coupon)

@@ -1,7 +1,7 @@
 module Api
   module V1
     class CouponsController < ApplicationController
-      before_action :set_coupon, only: [:show, :update, :destroy, :toggle_activation]
+      before_action :set_coupon, only: [:show, :update, :destroy, :toggle_activation, :activate, :deactivate]
       before_action :set_merchant, only: [:index, :create]  # Add this line to set the merchant
 
       # GET /api/v1/merchants/:merchant_id/coupons
@@ -16,13 +16,13 @@ module Api
             return
           end
         else
-          # If no 'status' param is passed, show all coupons
           @coupons = @merchant.coupons
         end
       
         # Return the filtered list of coupons
         render json: { data: @coupons.map { |coupon| coupon_json(coupon) } }
       end
+    
 
       def show
         render json: {
@@ -36,7 +36,7 @@ module Api
 
       def create
         @coupon = Coupon.new(coupon_params)
-        @coupon.activated = false  # Ensure this is set correctly
+        @coupon.activated = false  
         
         if @coupon.save
           render json: {
@@ -69,15 +69,30 @@ module Api
         render json: @coupon
       end
 
+      def deactivate
+        if @coupon.usage_count > 0
+          render json: { error: "Coupon cannot be deactivated because it has been used" }, status: :unprocessable_entity
+        else
+          @coupon.update(activated: false)
+          render json: { data: coupon_json(@coupon) }, status: :ok
+        end
+      end
+
+      
+      def activate
+        @coupon.update(activated: true)
+        render json: { data: coupon_json(@coupon) }, status: :ok
+      end
+
       
       private
 
       def set_coupon
-        @coupon = Coupon.find_by(id: params[:id])
+        @coupon = Coupon.find_by(id: params[:coupon_id])
         render json: { error: "Coupon not found" }, status: :not_found unless @coupon
       end
 
-      # Set the merchant based on the merchant_id from the URL
+
       def set_merchant
         @merchant = Merchant.find_by(id: params[:merchant_id])
         render json: { error: "Merchant not found" }, status: :not_found unless @merchant
@@ -99,7 +114,6 @@ module Api
         }
       end
 
-      # Helper method to format the coupon's data for the index action
       def coupon_json(coupon)
         {
           id: coupon.id,
@@ -107,8 +121,9 @@ module Api
           attributes: coupon_attributes(coupon)
         }
       end
-
-      
     end
   end
 end
+
+      
+    

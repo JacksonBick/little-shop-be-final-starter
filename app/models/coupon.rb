@@ -26,16 +26,6 @@ class Coupon < ApplicationRecord
     end
   end
 
-  def deactivate
-    return false if usage_count > 0
-    update(activated: false)
-  end
-
-  def activate
-    return false if activated?
-    update(activated: true)
-  end
-
   def set_default_activated
     self.activated ||= false
   end
