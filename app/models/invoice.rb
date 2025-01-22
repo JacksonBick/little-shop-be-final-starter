@@ -11,8 +11,10 @@ class Invoice < ApplicationRecord
   scope :filtered_by_status, ->(status) { where(status: status) }
 
   def apply_coupon(coupon)
-    if coupon.activated? && !self.coupon
-      update(coupon: coupon)
+    
+    if !coupon.activated? 
+      
+      update(coupon_id: coupon.id)
     else
       errors.add(:coupon, "cannot be applied")
     end

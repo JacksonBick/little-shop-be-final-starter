@@ -67,16 +67,18 @@ RSpec.describe Api::V1::CouponsController, type: :controller do
   end
 
   describe 'GET #show' do
-  it 'returns the coupon' do
-    # Ensure that the path is correct
-    get "/api/v1/merchants/#{@merchant.id}/coupons/#{@coupon.id}"  # Hardcoded path
-    
-    json_response = JSON.parse(response.body)
-    expect(response).to have_http_status(:ok)
-    expect(json_response['data']['id']).to eq(@coupon.id.to_s)
-    expect(json_response['data']['attributes']['name']).to eq(@coupon.name)
+    it 'returns the coupon' do
+      # Ensure that the path is correct
+      get "/api/v1/merchants/#{@merchant.id}/coupons/#{@coupon.id}" 
+      
+      #  get :show, params: { merchant_id: @merchant.id, coupon_id: @coupon.id }
+      
+      json_response = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['id']).to eq(@coupon.id.to_s)
+      expect(json_response['data']['attributes']['name']).to eq(@coupon.name)
+    end
   end
-end
 
   describe 'POST #create' do
     it 'creates a new coupon with valid attributes' do

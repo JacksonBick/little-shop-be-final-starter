@@ -1,4 +1,4 @@
-class Api::V1::CouponsController < ApplicationController
+class Api::V1::Merchants::CouponsController < ApplicationController
   before_action :set_coupon, only: [:show, :update, :destroy, :toggle_activation, :activate, :deactivate]
   before_action :set_merchant, only: [:index, :create]  
   # GET /api/v1/merchants/:merchant_id/coupons

@@ -19,11 +19,11 @@ class Api::V1::Merchants::InvoicesController < ApplicationController
       return render json: { error: "Coupon not found" }, status: :not_found
     end
 
-    if invoice.coupon.present?
+    if !invoice.coupon_id.nil?
       return render json: { error: "Invoice already has a coupon" }, status: :unprocessable_entity
     end
 
-    invoice.update(coupon: coupon)
+    invoice.update(coupon_id: coupon.id)
 
     render json: InvoiceSerializer.new(invoice), status: :ok
   end

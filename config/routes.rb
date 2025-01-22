@@ -29,12 +29,9 @@ Rails.application.routes.draw do
           post '/activate', to: 'coupons#activate'
         end
         resources :invoices, only: :index, controller: "merchants/invoices" do
-          post "/add_coupon", to: "invoices#add_coupon"
+          post "/add_coupon", to: "merchants/invoices#add_coupon"
           delete "/remove_coupon", to: "invoices#remove_coupon"
-        
-          
         end
-      
       end
     end
   end
