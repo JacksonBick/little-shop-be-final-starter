@@ -7,7 +7,7 @@ class Api::V1::Merchants::InvoicesController < ApplicationController
     else
       invoices = merchant.invoices
     end
-    render json: invoices, status: :ok  # Adjust based on your needs
+    render json: invoices, status: :ok  
   end
   
   def add_coupon
