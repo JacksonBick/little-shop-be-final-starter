@@ -1,7 +1,7 @@
-class Api::V1::Merchant::CouponController < ApplicationController
+class Api::V1::Merchants::CouponsController < ApplicationController
   
   before_action :set_merchant
-  before_action :set_coupon, only: [:show, :update, :destroy]
+  before_action :set_coupon, only: [:show, :update]
 
   def index
     render json: CouponSerializer.new(@merchant.coupons)
@@ -37,9 +37,17 @@ class Api::V1::Merchant::CouponController < ApplicationController
     end
   end
 
-  def destroy
+  def activate
+    if @coupon.update(status: true)
+      render json: CouponSerializer.new(@coupon), status: :ok
+    else
+      render json: @coupon.errors, status: :unprocessable_entity
+    end
+  end
+
+  def deactivate
     if @coupon.update(status: false)
-      render json: { message: "Coupon deactivated successfully." }, status: :ok
+      render json: CouponSerializer.new(@coupon), status: :ok
     else
       render json: @coupon.errors, status: :unprocessable_entity
     end
