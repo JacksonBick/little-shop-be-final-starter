@@ -12,7 +12,7 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   end
 
   def create
-    if @merchant.coupons.active.count >= 5 && coupon_params[:status] == true
+    if @merchant.coupons.active.count >= 5 
       render json: { error: "A merchant can only have a maximum of 5 active coupons at a time." }, status: :unprocessable_entity
     else
       @coupon = @merchant.coupons.new(coupon_params)
@@ -26,7 +26,7 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   end
 
   def update
-    if coupon_params[:status] == true && @merchant.coupons.active.count >= 5
+    if @merchant.coupons.active.count >= 5
       render json: { error: "A merchant can only have a maximum of 5 active coupons at a time." }, status: :unprocessable_entity
     else
       if @coupon.update(coupon_params)
