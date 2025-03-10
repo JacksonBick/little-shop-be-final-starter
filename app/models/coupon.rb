@@ -3,7 +3,7 @@ class Coupon < ApplicationRecord
   has_many :invoices
 
   validates :name, presence: true
-  validates :code, presence: true
+  validates :code, presence: true, uniqueness: true
   validates :discount_value, presence: true
   validates :discount_type, presence: true
   validates :status, presence: true

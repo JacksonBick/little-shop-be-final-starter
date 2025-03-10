@@ -153,7 +153,7 @@ RSpec.describe 'Merchant Coupons', type: :request do
       merchant = create(:merchant)
       coupon = create(:coupon, merchant: merchant, status: 'active')
 
-      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}/deactivate"
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}?deactivate=true"
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:ok)
@@ -166,7 +166,7 @@ RSpec.describe 'Merchant Coupons', type: :request do
       merchant = create(:merchant)
       coupon = create(:coupon, merchant: merchant, status: 'inactive')
 
-      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}/activate"
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}?activate=true"
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:ok)

@@ -28,12 +28,10 @@ RSpec.describe Coupon, type: :model do
   end
 
   describe 'usage_count' do
-    before do
-      @coupon = create(:coupon)
-      @invoice = create(:invoice, coupon: @coupon)
-    end
-
     it 'returns the count of invoices for a coupon' do
+      @coupon = create(:coupon)
+      expect(@coupon.usage_count).to eq(0)
+      @invoice = create(:invoice, coupon: @coupon)
       expect(@coupon.usage_count).to eq(1)
     end
 
