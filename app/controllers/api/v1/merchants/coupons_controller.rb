@@ -3,7 +3,7 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   rescue_from ActiveRecord::RecordInvalid, with: :record_invalid
   
   before_action :set_merchant
-  before_action :set_coupon, only: [:show, :update, :activate, :deactivate]
+  before_action :set_coupon, only: [:show, :update]
 
   def index
     @coupons = Coupon.filter_by_status(params[:status])
@@ -28,33 +28,33 @@ class Api::V1::Merchants::CouponsController < ApplicationController
 
 
   def update
-    if exceeds_active_coupon_limit?
-      return
+    if params[:activate].present?
+      if exceeds_active_coupon_limit?
+        return
+      else
+        @coupon.update(status: 'active')
+          render json: CouponSerializer.new(@coupon), status: :ok
+      end
+    elsif params[:deactivate].present?
+      
+      @coupon.update(status: 'inactive')
+      render json: CouponSerializer.new(@coupon), status: :ok
     else
-      if @coupon.update(coupon_params)
-        render json: CouponSerializer.new(@coupon)
+      if exceeds_active_coupon_limit?
+        return
+      else
+        if @coupon.update(coupon_params)
+          render json: CouponSerializer.new(@coupon)
+        end
       end
     end
-  end
-
-  def activate
-    if exceeds_active_coupon_limit?
-      return
-    else
-      @coupon.update(status: 'active')
-        render json: CouponSerializer.new(@coupon), status: :ok
-    end
-  end
-  
-  def deactivate
-    @coupon.update(status: 'inactive')
-      render json: CouponSerializer.new(@coupon), status: :ok
   end
 
   private
 
   def exceeds_active_coupon_limit?
-    if @merchant.coupons.where(status: 'active').count >= 5
+    # binding.pry
+    if @merchant.coupons.where(status: 'active').count >= 5 && params[:coupon][:status] == "active"
       render json: { error: "A merchant can only have a maximum of 5 active coupons at a time." }, status: :unprocessable_entity
       return true
     end
