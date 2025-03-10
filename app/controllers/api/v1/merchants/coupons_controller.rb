@@ -35,8 +35,12 @@ class Api::V1::Merchants::CouponsController < ApplicationController
   end
 
   def activate
-    @coupon.update(status: 'active')
-      render json: CouponSerializer.new(@coupon), status: :ok
+    if exceeds_active_coupon_limit?
+      return
+    else
+      @coupon.update(status: 'active')
+        render json: CouponSerializer.new(@coupon), status: :ok
+    end
   end
   
   def deactivate

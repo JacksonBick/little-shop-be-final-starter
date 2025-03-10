@@ -11,4 +11,7 @@ class Coupon < ApplicationRecord
   enum status: { inactive: false, active: true }
   scope :active, -> { where(status: true) }
 
+  def usage_count
+    invoices.count
+  end
 end
