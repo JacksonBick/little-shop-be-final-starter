@@ -10,14 +10,16 @@ RSpec.describe 'Merchant Coupons', type: :request do
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:ok)
-      expect(json[:data].size).to eq(5)
-
-      json[:data].each do |coupon|
-        expect(coupon[:attributes]).to have_key(:name)
-        expect(coupon[:attributes]).to have_key(:code)
-        expect(coupon[:attributes]).to have_key(:discount_value)
-        expect(coupon[:attributes]).to have_key(:discount_type)
-        expect(coupon[:attributes]).to have_key(:status)
+      expect(json.size).to eq(5)
+      
+      json.each do |coupon|
+        expect(coupon).to have_key(:id)
+        expect(coupon).to have_key(:merchant_id)
+        expect(coupon).to have_key(:name)
+        expect(coupon).to have_key(:code)
+        expect(coupon).to have_key(:discount_value)
+        expect(coupon).to have_key(:discount_type)
+        expect(coupon).to have_key(:status)
       end
     end
   end

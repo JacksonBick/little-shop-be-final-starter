@@ -10,8 +10,20 @@ class Coupon < ApplicationRecord
 
   enum status: { inactive: false, active: true }
   scope :active, -> { where(status: true) }
+  scope :inactive, -> { where(status: false) }
 
   def usage_count
     invoices.count
+  end
+
+  def self.filter_by_status(status)
+    case status
+    when 'active'
+      active
+    when 'inactive'
+      inactive
+    else
+      all 
+    end
   end
 end
