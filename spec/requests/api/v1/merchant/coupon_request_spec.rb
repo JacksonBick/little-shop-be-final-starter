@@ -159,6 +159,18 @@ RSpec.describe 'Merchant Coupons', type: :request do
       expect(response).to have_http_status(:ok)
       expect(json[:data][:attributes][:status]).to eq('inactive')  
     end
+    
+    it "Should not deactivate a coupon if being used on a invoice" do
+      merchant = create(:merchant)
+      coupon = create(:coupon, merchant: merchant, status: 'active')
+      invoice = create(:invoice, coupon: coupon)
+
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}?deactivate=true"
+
+      expect(response.status).to eq(422) 
+      expect(JSON.parse(response.body)['error']).to eq("The coupon is currently being used on a invoice")
+      expect(coupon.reload.status).to eq('active') 
+    end
   end
 
   describe 'PATCH activate a coupon' do

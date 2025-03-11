@@ -36,9 +36,12 @@ class Api::V1::Merchants::CouponsController < ApplicationController
           render json: CouponSerializer.new(@coupon), status: :ok
       end
     elsif params[:deactivate].present?
-      
+      if @coupon.invoices.empty?
       @coupon.update(status: 'inactive')
       render json: CouponSerializer.new(@coupon), status: :ok
+      else
+        render json: { error: "The coupon is currently being used on a invoice" }, status: :unprocessable_entity
+      end
     else
       if exceeds_active_coupon_limit?
         return
