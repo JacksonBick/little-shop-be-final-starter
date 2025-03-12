@@ -61,4 +61,38 @@ RSpec.describe Coupon, type: :model do
       expect(Coupon.filter_by_status('other')).to include(@active_coupon, @inactive_coupon)
     end
   end
+
+  describe 'Having valid discount type' do
+    before do
+      merchant = create(:merchant)
+
+      @valid_attributes = {
+        name: 'Summer Sale',
+        code: 'SUMMER20',
+        discount_value: 20,
+        discount_type: 'percentage',  
+        status: "active",
+        merchant: merchant
+      }
+
+      @invalid_attributes = {
+        name: 'Winter Sale',
+        code: 'WINTER20',
+        discount_value: 20,
+        discount_type: 'nothing', 
+        status: "active",
+        merchant: merchant
+      }
+    end
+
+    it 'is valid with a discount type of "percentage"' do
+      coupon = Coupon.new(@valid_attributes.merge(discount_type: 'percentage'))
+      expect(coupon).to be_valid
+    end
+
+    it 'is valid with a discount type of "dollar off"' do
+      coupon = Coupon.new(@valid_attributes.merge(discount_type: 'dollar off'))
+      expect(coupon).to be_valid
+    end
+  end
 end

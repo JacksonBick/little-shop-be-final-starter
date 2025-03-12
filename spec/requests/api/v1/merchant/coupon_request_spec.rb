@@ -47,7 +47,7 @@ RSpec.describe 'Merchant Coupons', type: :request do
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:not_found)
-      expect(json[:error]).to eq('Record not found')
+      expect(json[:error]).to eq('Coupon not found')
     end
   end
 
@@ -145,6 +145,25 @@ RSpec.describe 'Merchant Coupons', type: :request do
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:unprocessable_entity)
       expect(json[:error]).to eq('A merchant can only have a maximum of 5 active coupons at a time.')
+    end
+
+    it 'should return an error if the discount type is invalid' do
+      merchant = create(:merchant)
+      coupon = create(:coupon, merchant: merchant, status: 'inactive')
+      
+      updated_params = {
+        name: 'Invalid Discount',
+        code: 'INVALID20',
+        discount_value: 20,
+        discount_type: 'bruh',  
+        status: 'inactive'
+      }
+  
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}", params: { coupon: updated_params }
+  
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json[:error]).to eq('not a valid discount type')
     end
   end
 
