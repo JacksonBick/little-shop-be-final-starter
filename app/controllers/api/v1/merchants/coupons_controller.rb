@@ -30,20 +30,9 @@ class Api::V1::Merchants::CouponsController < ApplicationController
 
   def update
     if params[:activate].present?
-      if exceeds_active_coupon_limit? 
-        return
-      else
-        @coupon.update(status: 'active')
-          render json: CouponSerializer.new(@coupon), status: :ok
-      end
+        activate_coupon
     elsif params[:deactivate].present?
-      #to make sure coupon is not deactivated if it belongs to invoice
-      if @coupon.invoices.empty?
-      @coupon.update(status: 'inactive')
-      render json: CouponSerializer.new(@coupon), status: :ok
-      else
-        render json: { error: "The coupon is currently being used on a invoice" }, status: :unprocessable_entity
-      end
+      deactivate_coupon 
     else
       if params[:coupon][:status] == "active" && exceeds_active_coupon_limit?
         return
@@ -86,5 +75,24 @@ class Api::V1::Merchants::CouponsController < ApplicationController
 
   def handle_unique_violation
     render json: { error: "Coupon code must be unique" }, status: :unprocessable_entity
+  end
+
+  def activate_coupon
+    if exceeds_active_coupon_limit? 
+      return
+    else
+      @coupon.update(status: 'active')
+        render json: CouponSerializer.new(@coupon), status: :ok
+    end
+  end
+
+  def deactivate_coupon 
+    #to make sure coupon is not deactivated if it belongs to invoice
+    if @coupon.invoices.empty?
+      @coupon.update(status: 'inactive')
+      render json: CouponSerializer.new(@coupon), status: :ok
+    else
+        render json: { error: "The coupon is currently being used on a invoice" }, status: :unprocessable_entity
+    end
   end
 end
