@@ -10,14 +10,16 @@ RSpec.describe 'Merchant Coupons', type: :request do
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:ok)
-      expect(json[:data].size).to eq(5)
-
-      json[:data].each do |coupon|
-        expect(coupon[:attributes]).to have_key(:name)
-        expect(coupon[:attributes]).to have_key(:code)
-        expect(coupon[:attributes]).to have_key(:discount_value)
-        expect(coupon[:attributes]).to have_key(:discount_type)
-        expect(coupon[:attributes]).to have_key(:status)
+      expect(json.size).to eq(5)
+      
+      json.each do |coupon|
+        expect(coupon).to have_key(:id)
+        expect(coupon).to have_key(:merchant_id)
+        expect(coupon).to have_key(:name)
+        expect(coupon).to have_key(:code)
+        expect(coupon).to have_key(:discount_value)
+        expect(coupon).to have_key(:discount_type)
+        expect(coupon).to have_key(:status)
       end
     end
   end
@@ -45,7 +47,7 @@ RSpec.describe 'Merchant Coupons', type: :request do
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:not_found)
-      expect(json[:error]).to eq('Record not found')
+      expect(json[:error]).to eq('Coupon not found')
     end
   end
 
@@ -144,6 +146,25 @@ RSpec.describe 'Merchant Coupons', type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(json[:error]).to eq('A merchant can only have a maximum of 5 active coupons at a time.')
     end
+
+    it 'should return an error if the discount type is invalid' do
+      merchant = create(:merchant)
+      coupon = create(:coupon, merchant: merchant, status: 'inactive')
+      
+      updated_params = {
+        name: 'Invalid Discount',
+        code: 'INVALID20',
+        discount_value: 20,
+        discount_type: 'bruh',  
+        status: 'inactive'
+      }
+  
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}", params: { coupon: updated_params }
+  
+      json = JSON.parse(response.body, symbolize_names: true)
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json[:error]).to eq('not a valid discount type')
+    end
   end
 
   describe 'PATCH deactivate a coupon' do
@@ -151,11 +172,23 @@ RSpec.describe 'Merchant Coupons', type: :request do
       merchant = create(:merchant)
       coupon = create(:coupon, merchant: merchant, status: 'active')
 
-      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}/deactivate"
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}?deactivate=true"
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:ok)
       expect(json[:data][:attributes][:status]).to eq('inactive')  
+    end
+    
+    it "Should not deactivate a coupon if being used on a invoice" do
+      merchant = create(:merchant)
+      coupon = create(:coupon, merchant: merchant, status: 'active')
+      invoice = create(:invoice, coupon: coupon)
+
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}?deactivate=true"
+
+      expect(response.status).to eq(422) 
+      expect(JSON.parse(response.body)['error']).to eq("The coupon is currently being used on a invoice")
+      expect(coupon.reload.status).to eq('active') 
     end
   end
 
@@ -164,7 +197,7 @@ RSpec.describe 'Merchant Coupons', type: :request do
       merchant = create(:merchant)
       coupon = create(:coupon, merchant: merchant, status: 'inactive')
 
-      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}/activate"
+      patch "/api/v1/merchants/#{merchant.id}/coupons/#{coupon.id}?activate=true"
 
       json = JSON.parse(response.body, symbolize_names: true)
       expect(response).to have_http_status(:ok)
